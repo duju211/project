@@ -1,0 +1,11 @@
+library(tarchetypes)
+library(ggbeeswarm)
+library(conflicted)
+library(tidyverse)
+library(janitor)
+library(targets)
+library(scales)
+library(rvest)
+library(fs)
+
+conflict_prefer("filter", "dplyr")
