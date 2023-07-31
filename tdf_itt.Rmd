@@ -1,0 +1,89 @@
+---
+title: "Untitled"
+description: |
+  A new article created using the Distill format.
+author:
+  - name: Nora Jones 
+    url: https://example.com/norajones
+    affiliation: Spacely Sprockets
+    affiliation_url: https://example.com/spacelysprokets
+date: "`r Sys.Date()`"
+output: distill::distill_article
+params:
+  interactive: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set()
+```
+
+```{r setup_interactive, eval=params$interactive, include=FALSE}
+source("libraries.R")
+```
+
+# Idea
+
+# Data
+
+Extract all urls for TdF edtions from the last years.
+Scrape stages overview. Determine relevant nodes by looking for
+'`r tar_read(stages_urls_css)`'.
+
+```{r, file="R/stages_overview_raw.R"}
+```
+
+```{r, echo=FALSE}
+tar_read(df_stages_overview_combined_raw)
+```
+
+Filter for time trial stages. Keep only rows containing the key word
+'`r tar_read(time_trial_regex)[[1]]`' to do so. After filtering, further process
+the description to keep the string short and simple:
+
+```{r, file="R/stages_itt.R"}
+```
+
+```{r, echo=FALSE}
+tar_read(df_stages_itt)
+```
+
+For every time trial, scrape the result of the stage:
+
+```{r, file="R/stage_raw.R"}
+```
+
+Preprocess stage data:
+
+```{r, file="R/stage.R"}
+```
+
+Calculate time delta to winner time for each rider.
+
+```{r, file="R/time_delta.R"}
+```
+
+```{r, echo=FALSE}
+tar_read(df_time_delta)
+```
+
+Extract time for each winner:
+
+```{r, file="R/winner_time.R"}
+```
+
+# Analysis
+
+Combine everything into one data frame. Calculate total time for each rider:
+
+```{r, file="R/total_time.R"}
+```
+
+Visualize data:
+
+```{r, file="R/vis_total_time.R"}
+```
+
+```{r, echo=FALSE}
+tar_read(gg_total_time)
+```
+
