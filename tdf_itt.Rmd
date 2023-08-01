@@ -23,6 +23,11 @@ source("libraries.R")
 
 # Idea
 
+Use the following functions to do so:
+
+```{r, file="libraries.R", eval=FALSE}
+```
+
 # Data
 
 Extract all urls for TdF edtions from the last years.
