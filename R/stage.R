@@ -1,5 +1,5 @@
-stage <- function(df_stage_raw) {
-  df_stage_raw |>
-    mutate(rnk = row_number()) |>
-    filter(!is.na(rnk))
+stage <- function(cycling_stats_url, stages_paths, stage_tbl_css) {
+  session_bow <- bow(cycling_stats_url)
+  
+  map_df(stages_paths, \(x) scrape_stage(session_bow, x, stage_tbl_css))
 }

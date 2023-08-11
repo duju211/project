@@ -11,6 +11,8 @@ date: "`r Sys.Date()`"
 output: distill::distill_article
 params:
   interactive: TRUE
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -24,29 +26,68 @@ source("libraries.R")
 # Idea
 
 In Tour de France history, time trials always are a spectacle of their own.
-Oftentimes they are a decisive factor on who wins the general classification of
-an edition. This was also the case this year with a stunning performance of
-Jonas Vingegaard. In this post we want to look at the performance of Jonas
-Vingegaard. This post is heavily inspired by this post [here](https://www.reddit.com/r/peloton/comments/153ys8r/most_dominant_tt_performances_in_the_tdf_since/?utm_source=share&utm_medium=android_app&utm_name=androidcss&utm_term=3&utm_content=share_button).
+Oftentimes they are a decisive factor on who wins the general classification
+each year. This was also the case this year with a stunning performance of
+Jonas Vingegaard on the 16th stage from Passy to Combloux.
+
+In this post we want to look at the performance of Jonas
+Vingegaard in more detail, heavily inspired by this post 
+[here](https://www.reddit.com/r/peloton/comments/153ys8r/most_dominant_tt_performances_in_the_tdf_since/?utm_source=share&utm_medium=android_app&utm_name=androidcss&utm_term=3&utm_content=share_button).
+We will scrape and visualize the data within R using the following packages:
 
 ```{r, file="libraries.R", eval=FALSE}
 ```
 
 # Data
 
-Extract all urls for TdF edtions from the last years.
-Scrape stages overview. Determine relevant nodes by looking for
-'`r tar_read(stages_urls_css)`'.
+First we need the raw data.
+Extract all urls for TdF edtions from the last years
+(up until year `r tar_read(start_year)`). Create the url of each edition
+by adding the year to '`r tar_read(cycling_stats_url)`':
+
+```{r, file="R/tdf_editions.R"}
+```
+
+```{r, echo=FALSE}
+tar_read(df_tdf_editions)
+```
+
+Scrape the stage overview for each url using the following helper function.
+After a first introduction (next code chunk) we only alter the
+url a little bit by applying the `polite::nod` function. Scraping is done
+with `polite::scrape`. Keep only certain elements of the scraped html by looking
+for CSS '`r tar_read(stages_urls_css)`'.
+
+```{r, file="R/scrape_overview.R"}
+```
+
+Before we apply this function multiple times, we first introduce ourselves with
+the `polite::bow` function. After that we apply the above function to each
+edition.
 
 ```{r, file="R/stages_overview_raw.R"}
 ```
+
+The result looks like this:
 
 ```{r, echo=FALSE}
 tar_read(df_stages_overview_combined_raw)
 ```
 
-Filter for time trial stages. Keep only rows containing the key word
-'`r tar_read(time_trial_regex)[[1]]`' to do so. After filtering, further process
+Preprocess stages overview. Only keep rows with description and extract year
+of the edition from `href`:
+
+```{r, file="R/stages_overview.R"}
+```
+
+Filter for time trial stages. Keep only rows containing the following key word
+to do so:
+
+```{r, echo=FALSE}
+tar_read(time_trial_regex)[[1]]
+```
+
+ After filtering, further process
 the description to keep the string short and simple:
 
 ```{r, file="R/stages_itt.R"}
@@ -56,17 +97,25 @@ the description to keep the string short and simple:
 tar_read(df_stages_itt)
 ```
 
-For every time trial, scrape the result of the stage:
+For every time trial, scrape the result of the stage. Use the following helper
+function. In the scraped html look for the CSS defined by
+'`r tar_read(stage_tbl_css)`'.
 
-```{r, file="R/stage_raw.R"}
+```{r, file="R/scrape_stage.R"}
 ```
 
-Preprocess stage data:
+Again, first `bow` to the host and then apply the function from the
+above code chunk repeatedly:
 
 ```{r, file="R/stage.R"}
 ```
 
-Calculate time delta to winner time for each rider.
+```{r, echo=FALSE}
+tar_read(df_stage)
+```
+
+
+Calculate time delta to winner time for each rider:
 
 ```{r, file="R/time_delta.R"}
 ```

@@ -2,17 +2,6 @@ source("libraries.R")
 
 walk(dir_ls("R"), source)
 
-df_tdf_editions <- tibble(
-  year = 2000:year(today()),
-  url_edition = str_glue(
-    "https://www.procyclingstats.com/race/tour-de-france/{year}"))
-
-mapped_stages_overview <- tar_map(
-  df_tdf_editions, names = "year", unlist = FALSE,
-  tar_target(
-    df_stages_overview_raw,
-    stages_overview_raw(url_edition, stages_urls_css)))
-
 list(
   tar_target(
     ex_url,
@@ -26,22 +15,25 @@ list(
   tar_target(stages_overview_tbl_css, ".basic"),
   tar_target(stages_urls_css, ".basic a:nth-child(1)"),
   tar_target(time_trial_regex, regex("\\(ITT\\)", ignore_case = TRUE)),
+  tar_target(cycling_stats_url, "https://www.procyclingstats.com/"),
+  tar_target(cycling_stats_url_bow, bow(cycling_stats_url)),
+  tar_target(stages_overview_path, "race/tour-de-france/"),
+  tar_target(start_year, 2000),
   
-  mapped_stages_overview,
-  tar_combine(
-    df_stages_overview_combined_raw,
-    mapped_stages_overview[["df_stages_overview_raw"]],
-    command = dplyr::bind_rows(!!!.x, .id = "year")),
   tar_target(
-    df_stages_itt,
-    stages_itt(df_stages_overview_combined_raw, time_trial_regex)),
+    df_tdf_editions, tdf_editions(start_year, stages_overview_path)),
+  tar_target(so_paths, pull(df_tdf_editions, so_path)),
   tar_target(
-    urls_stages, pull(df_stages_itt, url)),
+    df_stages_overview_raw,
+    stages_overview_raw(cycling_stats_url, so_paths, stages_urls_css)),
   tar_target(
-    df_stage_raw,
-    stage_raw(urls_stages, stage_tbl_css),
-    pattern = map(urls_stages)),
-  tar_target(df_stage, stage(df_stage_raw), pattern = map(df_stage_raw)),
+    df_stages_overview,
+    stages_overview(df_stages_overview_raw, cycling_stats_url)),
+  tar_target(
+    df_stages_itt, stages_itt(df_stages_overview, time_trial_regex)),
+  tar_target(stages_paths, pull(df_stages_itt, href)),
+  tar_target(
+    df_stage, stage(cycling_stats_url, stages_paths, stage_tbl_css)),
   tar_target(df_time_delta, time_delta(df_stage)),
   tar_target(df_winner_time, winner_time(df_stage)),
   tar_target(
