@@ -1,5 +1,6 @@
 vis_total_time <- function(df_total_time, df_total_time_summary) {
   df_total_time |>
+    filter(diff_winner_perc != 0) |>
     mutate(desc = fct_rev(factor(desc, df_total_time_summary$desc))) |>
     ggplot(aes(y = desc, x = diff_winner_perc)) +
     geom_beeswarm(alpha = 0.2) +
