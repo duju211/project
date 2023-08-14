@@ -38,7 +38,9 @@ list(
   tar_target(df_winner_time, winner_time(df_stage)),
   tar_target(
     df_total_time, total_time(df_time_delta, df_winner_time, df_stages_itt)),
-  tar_target(gg_total_time, vis_total_time(df_total_time)),
+  tar_target(df_total_time_summary, total_time_summary(df_total_time)),
+  tar_target(
+    gg_total_time, vis_total_time(df_total_time, df_total_time_summary)),
   
   tar_render(
     tdf_post, "tdf_itt.Rmd",

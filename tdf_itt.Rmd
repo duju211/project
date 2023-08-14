@@ -136,6 +136,11 @@ Combine everything into one data frame. Calculate total time for each rider:
 ```{r, file="R/total_time.R"}
 ```
 
+Summarise data per stage. Use this summyary later in the plot.
+
+```{r, file="R/total_time_summary.R"}
+```
+
 Visualize data:
 
 ```{r, file="R/vis_total_time.R"}
