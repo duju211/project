@@ -71,7 +71,7 @@ edition.
 The result looks like this:
 
 ```{r, echo=FALSE}
-tar_read(df_stages_overview_combined_raw)
+tar_read(df_stages_overview)
 ```
 
 Preprocess stages overview. Only keep rows with description and extract year
