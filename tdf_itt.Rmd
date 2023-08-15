@@ -7,6 +7,7 @@ author:
     url: https://example.com/norajones
 date: "`r Sys.Date()`"
 output: distill::distill_article
+preview: "https://github.com/duju211/tour_tt/blob/6988904fb8fb537e677bd8eb61c46d228ee74bcc/README_files/figure-markdown_strict/plot_total_time-1.png"
 creative_commons: CC BY
 repository_url: https://github.com/duju211/tour_tt
 base_url: https://www.datannery.com/posts/tdf_itt/
@@ -148,7 +149,7 @@ preceding code chunk:
 ```{r, file="R/vis_total_time.R"}
 ```
 
-```{r plot_total_time, echo=FALSE, fig.height=7, fig.width=8, preview=TRUE}
+```{r plot_total_time, echo=FALSE, fig.height=7, fig.width=8}
 tar_read(gg_total_time)
 ```
 
