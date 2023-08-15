@@ -44,5 +44,8 @@ list(
   
   tar_render(
     tdf_post, "tdf_itt.Rmd",
-    params = list(interactive = FALSE))
+    params = list(interactive = FALSE)),
+  tar_render(
+    tdf_readme, "tdf_itt.Rmd", output_format = "md_document",
+    output_file = "README.md")
 )

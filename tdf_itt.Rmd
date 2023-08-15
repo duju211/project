@@ -149,7 +149,7 @@ preceding code chunk:
 ```{r, file="R/vis_total_time.R"}
 ```
 
-```{r, echo=FALSE, fig.height=7, fig.width=8, preview=TRUE}
+```{r plot_total_time, echo=FALSE, fig.height=7, fig.width=8, preview=TRUE}
 tar_read(gg_total_time)
 ```
 
