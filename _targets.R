@@ -16,9 +16,10 @@ list(
   tar_target(stages_urls_css, ".basic a:nth-child(1)"),
   tar_target(time_trial_regex, regex("\\(ITT\\)", ignore_case = TRUE)),
   tar_target(cycling_stats_url, "https://www.procyclingstats.com/"),
-  tar_target(cycling_stats_url_bow, bow(cycling_stats_url)),
   tar_target(stages_overview_path, "race/tour-de-france/"),
   tar_target(start_year, 2000),
+  tar_target(
+    rvest_url, "https://rvest.tidyverse.org/articles/selectorgadget.html"),
   
   tar_target(
     df_tdf_editions, tdf_editions(start_year, stages_overview_path)),
@@ -39,8 +40,7 @@ list(
   tar_target(
     df_total_time, total_time(df_time_delta, df_winner_time, df_stages_itt)),
   tar_target(df_total_time_summary, total_time_summary(df_total_time)),
-  tar_target(
-    gg_total_time, vis_total_time(df_total_time, df_total_time_summary)),
+  tar_target(gg_total_time, vis_total_time(df_total_time_summary)),
   
   tar_render(
     tdf_post, "tdf_itt.Rmd",

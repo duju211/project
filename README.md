@@ -28,9 +28,12 @@ packages:
 
 # Data
 
-First we need the raw data. Extract all urls for TdF editions from the
-last years (up until year 2000). Create the url of each edition by
-adding the year to ‘<https://www.procyclingstats.com/>’:
+First we need the raw data. We will get the raw data from
+’<https://www.procyclingstats.com/>.
+
+The exact path where we will get the data, is determined by the string
+‘race/tour-de-france/’ + the year (up until year 2000) of the Tour de
+France edtion:
 
     tdf_editions <- function(start_year, stages_overview_path) {
       years <- start_year:year(today())
@@ -55,11 +58,16 @@ adding the year to ‘<https://www.procyclingstats.com/>’:
     ## 10  2009 race/tour-de-france/2009
     ## # ℹ 14 more rows
 
-Scrape the stage overview for each url using the following helper
-function. After a first introduction (next code chunk) we only alter the
-url a little bit by applying the `polite::nod` function. Scraping is
-done with `polite::scrape`. Keep only certain elements of the scraped
-html by looking for CSS ‘.basic a:nth-child(1)’.
+Scrape the stage overview for each edition by using the following helper
+function. After a first introduction (next code chunk) we alter the url
+by adding the path from the above code chunk. We do this by applying the
+`polite::nod` function. After the exact url is determined, we scrape the
+content of the webpage using the `polite::scrape` function.
+
+Keep only certain elements of the scraped html by looking for CSS
+‘.basic a:nth-child(1)’. The CSS was determined using techniques
+described in this
+[vignette](https://rvest.tidyverse.org/articles/selectorgadget.html).
 
     scrape_overview <- function(session_bow, so_path, stages_urls_css) {
       scrape_url <- nod(session_bow, path = so_path)
@@ -78,7 +86,7 @@ html by looking for CSS ‘.basic a:nth-child(1)’.
 Before we apply this function multiple times, we first introduce
 ourselves with the `polite::bow` function. After that we apply the above
 function to each edition. By doing this we automatically apply to the
-scraping restriction defined in `robots.txt`.
+scraping restrictions defined in `robots.txt`.
 
     stages_overview_raw <- function(cycling_stats_url, so_paths, stages_urls_css) {
       session_bow <- bow(cycling_stats_url)
@@ -242,25 +250,27 @@ rider:
         left_join(df_stages_itt, by = "url_stage")
     }
 
-Summarise data per stage. Use this summary to arrange the different
-stages later in the plot.
+Summarise data per stage. Use this summary to arrange the description as
+an ordered factor. Exclude winner rows from the data:
 
     total_time_summary <- function(df_total_time) {
-      df_total_time |>
+      df_total_time_summary <- df_total_time |>
         filter(diff_winner_perc != 0) |>
         group_by(desc) |>
         summarise(median_diff_winner_perc = median(diff_winner_perc)) |>
         arrange(desc(median_diff_winner_perc)) |>
         mutate(desc = fct_inorder(desc))
+      
+      df_total_time |>
+        filter(diff_winner_perc != 0) |>
+        mutate(desc = fct_rev(factor(desc, df_total_time_summary$desc)))
     }
 
 Visualize data. Arrange the stages based on the summary calculated in
 the preceding code chunk:
 
-    vis_total_time <- function(df_total_time, df_total_time_summary) {
-      df_total_time |>
-        filter(diff_winner_perc != 0) |>
-        mutate(desc = fct_rev(factor(desc, df_total_time_summary$desc))) |>
+    vis_total_time <- function(df_total_time_summary) {
+      df_total_time_summary |>
         ggplot(aes(y = desc, x = diff_winner_perc)) +
         geom_beeswarm(alpha = 0.2) +
         geom_boxplot() +

@@ -40,10 +40,12 @@ We will scrape and visualize the data within R using the following packages:
 
 # Data
 
-First we need the raw data.
-Extract all urls for TdF editions from the last years
-(up until year `r tar_read(start_year)`). Create the url of each edition
-by adding the year to '`r tar_read(cycling_stats_url)`':
+First we need the raw data. We will get the raw data from
+'`r tar_read(cycling_stats_url)`.
+
+The exact path where we will get the data, is determined by the string
+'`r tar_read(stages_overview_path)`' + the year
+(up until year `r tar_read(start_year)`) of the Tour de France edtion:
 
 ```{r, file="R/tdf_editions.R"}
 ```
@@ -52,11 +54,17 @@ by adding the year to '`r tar_read(cycling_stats_url)`':
 tar_read(df_tdf_editions)
 ```
 
-Scrape the stage overview for each url using the following helper function.
-After a first introduction (next code chunk) we only alter the
-url a little bit by applying the `polite::nod` function. Scraping is done
-with `polite::scrape`. Keep only certain elements of the scraped html by looking
-for CSS '`r tar_read(stages_urls_css)`'.
+Scrape the stage overview for each edition by using the following helper
+function.
+After a first introduction (next code chunk) we alter the url by adding the
+path from the above code chunk.
+We do this by applying the `polite::nod` function.
+After the exact url is determined, we scrape the content of the webpage using
+the `polite::scrape` function.
+
+Keep only certain elements of the scraped html by looking
+for CSS '`r tar_read(stages_urls_css)`'. The CSS was determined using
+techniques described in this [vignette](`r tar_read(rvest_url)`).
 
 ```{r, file="R/scrape_overview.R"}
 ```
@@ -64,7 +72,7 @@ for CSS '`r tar_read(stages_urls_css)`'.
 Before we apply this function multiple times, we first introduce ourselves with
 the `polite::bow` function. After that we apply the above function to each
 edition. By doing this we automatically apply to the
-scraping restriction defined in `robots.txt`.
+scraping restrictions defined in `robots.txt`.
 
 ```{r, file="R/stages_overview_raw.R"}
 ```
@@ -137,8 +145,8 @@ Combine everything into one data frame. Calculate total time for each rider:
 ```{r, file="R/total_time.R"}
 ```
 
-Summarise data per stage. Use this summary to arrange the different stages later
-in the plot.
+Summarise data per stage. Use this summary to arrange the description as an
+ordered factor. Exclude winner rows from the data:
 
 ```{r, file="R/total_time_summary.R"}
 ```
