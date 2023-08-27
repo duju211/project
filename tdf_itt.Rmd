@@ -157,8 +157,8 @@ preceding code chunk:
 ```{r, file="R/vis_total_time.R"}
 ```
 
-```{r plot_total_time, echo=FALSE, fig.height=7, fig.width=8}
-tar_read(gg_total_time)
+```{r plot_total_time, echo=FALSE}
+knitr::include_graphics(tar_read(png_total_time))
 ```
 
 The top stages are almost all (except for `Cap Découverte`) mountain time

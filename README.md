@@ -282,7 +282,7 @@ the preceding code chunk:
         labs(y = "Stage", x = "Difference to Winner Time [%]")
     }
 
-![](README_files/figure-markdown_strict/plot_total_time-1.png)
+<img src="total_time.png" width="2100" />
 
 The top stages are almost all (except for `Cap Découverte`) mountain
 time trials. One can see that this years time trial stands out from the
