@@ -270,6 +270,8 @@ Visualize data. Arrange the stages based on the summary calculated in
 the preceding code chunk:
 
     vis_total_time <- function(df_total_time_summary) {
+      set.seed(10923)
+      
       df_total_time_summary |>
         ggplot(aes(y = desc, x = diff_winner_perc)) +
         geom_beeswarm(alpha = 0.2) +
