@@ -7,7 +7,7 @@ author:
     url: https://example.com/norajones
 date: "`r Sys.Date()`"
 output: distill::distill_article
-preview: "https://github.com/duju211/tour_tt/blob/0a11c912b562f366506fcbe2607e3ba261ffb4ca/README_files/figure-markdown_strict/plot_total_time-1.png?raw=true"
+preview: "https://raw.githubusercontent.com/duju211/tour_tt/master/total_time.png"
 creative_commons: CC BY
 repository_url: https://github.com/duju211/tour_tt
 base_url: https://www.datannery.com/posts/tdf_itt/
