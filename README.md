@@ -26,6 +26,13 @@ packages:
 
     conflict_prefer("filter", "dplyr")
 
+In order to reproduce this analysis, you have to perform the following
+steps:
+
+-   Clone the [repository](https://github.com/duju211/tour_tt)
+-   Run `renv::restore()`
+-   Run `targets::tar_make()`
+
 # Data
 
 First we need the raw data. We will get the raw data from
