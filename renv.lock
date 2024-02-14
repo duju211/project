@@ -93,6 +93,22 @@
       ],
       "Hash": "cad6cf7f1d5f6e906700b9d3e718c796"
     },
+    "assertr": {
+      "Package": "assertr",
+      "Version": "3.0.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "MASS",
+        "R",
+        "dplyr",
+        "methods",
+        "rlang",
+        "stats",
+        "utils"
+      ],
+      "Hash": "dd34511e88d11c95e80f8d9bb0606e79"
+    },
     "assertthat": {
       "Package": "assertthat",
       "Version": "0.2.1",

@@ -9,8 +9,17 @@ Combloux.
 In this post we want to look at the performance of Jonas Vingegaard in
 more detail, heavily inspired by this post
 [here](https://www.reddit.com/r/peloton/comments/153ys8r/most_dominant_tt_performances_in_the_tdf_since/?utm_source=share&utm_medium=android_app&utm_name=androidcss&utm_term=3&utm_content=share_button).
-We will scrape and visualize the data within R using the following
-packages:
+
+In order to reproduce this analysis in one go, you have to perform the
+following steps:
+
+-   Clone the [repository](https://github.com/duju211/tour_tt)
+-   Run `renv::restore()`
+-   Run `targets::tar_make()`
+
+Alternatively you could copy and paste the code chunks into your R
+session and execute them one after the other. You would have to install
+the following packages by hand:
 
     library(tarchetypes)
     library(ggbeeswarm)
@@ -27,14 +36,19 @@ packages:
 
     conflict_prefer("filter", "dplyr")
 
-In order to reproduce this analysis, you have to perform the following
-steps:
-
--   Clone the [repository](https://github.com/duju211/tour_tt)
--   Run `renv::restore()`
--   Run `targets::tar_make()`
-
 # Data
+
+Define global variables:
+
+    cycling_stats_url <- "https://www.procyclingstats.com/"
+
+    start_year <- 2000
+
+    stages_overview_path <- "race/tour-de-france/"
+
+    stages_urls_css <- ".basic a:nth-child(1)"
+
+    time_trial_regex <- regex("\\(ITT\\)", ignore_case = TRUE)
 
 First we need the raw data. We will get the raw data from
 ’<https://www.procyclingstats.com/>.
@@ -67,6 +81,10 @@ France edtion:
     ##  9  2008 race/tour-de-france/2008
     ## 10  2009 race/tour-de-france/2009
     ## # ℹ 15 more rows
+
+Pull all paths into a vector for later analysis:
+
+    so_paths <- pull(df_tdf_editions, so_path)
 
 Scrape the stage overview for each edition by using the following helper
 function. After a first introduction (next code chunk) we alter the url
@@ -174,6 +192,10 @@ short and simple:
     ## 10 race/tour-de-france/2004/stage-19 19 Bes… https://www.procyc…  2004 https://…
     ## # ℹ 30 more rows
 
+Pull all the links into a vector for later analysis:
+
+    stages_paths <- pull(df_stages_itt, href)
+
 For every time trial, scrape the result of the stage. Use the following
 helper function. In the scraped html look for the CSS defined by
 ‘div.result-cont:nth-child(5) &gt; div:nth-child(1) &gt;
@@ -231,6 +253,8 @@ Calculate time delta to winner time for each rider:
         filter(!is.na(time_delta), time_delta >= 0)
     }
 
+    df_time_delta <- time_delta(df_stage)
+
     ## # A tibble: 6,548 × 3
     ##    url_stage                                                    rider time_delta
     ##    <chr>                                                        <chr> <Period>  
@@ -255,6 +279,8 @@ Extract time for each winner:
         mutate(winner_time = hms(winner_time))
     }
 
+    df_winner_time <- winner_time(df_stage)
+
 # Analysis
 
 Combine everything into one data frame. Calculate total time for each
@@ -269,6 +295,8 @@ rider:
           diff_winner_perc = (time - winner_time) / winner_time) |>
         left_join(df_stages_itt, by = "url_stage")
     }
+
+    df_total_time <- total_time(df_time_delta, df_winner_time, df_stages_itt)
 
 Summarise data per stage. Use this summary to arrange the description as
 an ordered factor. Exclude winner rows from the data:
@@ -286,6 +314,8 @@ an ordered factor. Exclude winner rows from the data:
         mutate(desc = fct_rev(factor(desc, df_total_time_summary$desc)))
     }
 
+    df_total_time_summary <- total_time_summary(df_total_time)
+
 Visualize data. Arrange the stages based on the summary calculated in
 the preceding code chunk:
 
@@ -301,6 +331,8 @@ the preceding code chunk:
         scale_x_continuous(labels = label_percent()) +
         labs(y = "Stage", x = "Difference to Winner Time [%]")
     }
+
+    gg_total_time <- vis_total_time(df_total_time_summary)
 
 <img src="total_time.png" width="2100" />
 
