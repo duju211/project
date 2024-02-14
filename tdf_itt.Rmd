@@ -19,9 +19,14 @@ params:
 knitr::opts_chunk$set()
 ```
 
-```{r setup_interactive, eval=params$interactive, include=FALSE}
+```{r setup_interactive, include=FALSE}
 source("libraries.R")
+
+df_manifest_raw <- tar_manifest()
+df_manifest <- df_manifest_raw |>
+  mutate(command = str_glue("{name} <- {command}"))
 ```
+
 
 # Idea
 
@@ -33,31 +38,78 @@ Jonas Vingegaard on the 16th stage from Passy to Combloux.
 In this post we want to look at the performance of Jonas
 Vingegaard in more detail, heavily inspired by this post 
 [here](https://www.reddit.com/r/peloton/comments/153ys8r/most_dominant_tt_performances_in_the_tdf_since/?utm_source=share&utm_medium=android_app&utm_name=androidcss&utm_term=3&utm_content=share_button).
-We will scrape and visualize the data within R using the following packages:
 
-```{r, file="libraries.R", eval=FALSE}
-```
-
-In order to reproduce this analysis, you have to perform the following steps:
+In order to reproduce this analysis in one go,
+you have to perform the following steps:
 
 * Clone the [repository](https://github.com/duju211/tour_tt)
 * Run `renv::restore()`
 * Run `targets::tar_make()`
 
+Alternatively you could copy and paste the code chunks into your R session
+and execute them one after the other.
+You would have to install the following packages by hand:
+
+```{r, file="libraries.R", eval=!params$interactive}
+```
+
 # Data
 
+Define global variables:
+
+```{r cycling_stats_url}
+#| code=df_manifest$command[df_manifest$name == "cycling_stats_url"],
+```
+
+```{r start_year}
+#| code=df_manifest$command[df_manifest$name == "start_year"],
+```
+
+```{r}
+#| code=df_manifest$command[df_manifest$name == "stages_overview_path"],
+```
+
+```{r stages_overview_path}
+#| code=df_manifest$command[df_manifest$name == "stages_urls_css"],
+```
+
+```{r time_trial_regex}
+#| code=df_manifest$command[df_manifest$name == "time_trial_regex"],
+```
+
+```{r stage_tbl_css}
+#| code=df_manifest$command[df_manifest$name == "stage_tbl_css"],
+#| include=FALSE
+```
+
 First we need the raw data. We will get the raw data from
-'`r tar_read(cycling_stats_url)`.
+'`r cycling_stats_url`.
 
 The exact path where we will get the data, is determined by the string
-'`r tar_read(stages_overview_path)`' + the year
-(up until year `r tar_read(start_year)`) of the Tour de France edtion:
+'`r stages_overview_path`' + the year
+(up until year `r start_year`) of the Tour de France edtion:
 
 ```{r, file="R/tdf_editions.R"}
 ```
 
+```{r df_tdf_editions}
+#| code=df_manifest$command[df_manifest$name == "df_tdf_editions"],
+#| eval=!params$interactive
+```
+
 ```{r, echo=FALSE}
-tar_read(df_tdf_editions)
+if (params$interactive) {
+  tar_read(df_tdf_editions)
+} else {
+  df_tdf_editions
+}
+```
+
+Pull all paths into a vector for later analysis:
+
+```{r so_paths}
+#| code=df_manifest$command[df_manifest$name == "so_paths"],
+#| eval=!params$interactive
 ```
 
 Scrape the stage overview for each edition by using the following helper
@@ -69,7 +121,7 @@ After the exact url is determined, we scrape the content of the webpage using
 the `polite::scrape` function.
 
 Keep only certain elements of the scraped html by looking
-for CSS '`r tar_read(stages_urls_css)`'. The CSS was determined using
+for CSS '`r stages_urls_css`'. The CSS was determined using
 techniques described in this [vignette](`r tar_read(rvest_url)`).
 
 ```{r, file="R/scrape_overview.R"}
@@ -83,10 +135,19 @@ scraping restrictions defined in `robots.txt`.
 ```{r, file="R/stages_overview_raw.R"}
 ```
 
+```{r df_stages_overview_raw}
+#| code=df_manifest$command[df_manifest$name == "df_stages_overview_raw"],
+#| eval=!params$interactive
+```
+
 The result looks like this:
 
 ```{r, echo=FALSE}
-tar_read(df_stages_overview)
+if (params$interactive) {
+  tar_read(df_stages_overview_raw)
+} else {
+  df_stages_overview_raw
+}
 ```
 
 Preprocess stages overview. Only keep rows with description and extract year
@@ -95,11 +156,16 @@ of the edition from `href`:
 ```{r, file="R/stages_overview.R"}
 ```
 
+```{r df_stages_overview}
+#| code=df_manifest$command[df_manifest$name == "df_stages_overview"],
+#| eval=!params$interactive
+```
+
 Filter for time trial stages. Keep only rows containing the following key word
 to do so:
 
 ```{r, echo=FALSE}
-tar_read(time_trial_regex)[[1]]
+time_trial_regex[[1]]
 ```
 
  After filtering, further process
@@ -108,8 +174,21 @@ the description to keep the string short and simple:
 ```{r, file="R/stages_itt.R"}
 ```
 
+```{r df_stages_itt}
+#| code=df_manifest$command[df_manifest$name == "df_stages_itt"],
+#| eval=!params$interactive
+```
+
+
 ```{r, echo=FALSE}
 tar_read(df_stages_itt)
+```
+
+Pull all the links into a vector for later analysis:
+
+```{r stages_paths}
+#| code=df_manifest$command[df_manifest$name == "stages_paths"],
+#| eval=!params$interactive
 ```
 
 For every time trial, scrape the result of the stage. Use the following helper
@@ -125,24 +204,47 @@ above code chunk repeatedly.
 ```{r, file="R/stage.R"}
 ```
 
-```{r, echo=FALSE}
-tar_read(df_stage)
+```{r df_stage}
+#| code=df_manifest$command[df_manifest$name == "df_stage"],
+#| eval=!params$interactive
 ```
 
+```{r, echo=FALSE}
+if (params$interactive) {
+  tar_read(df_stage)
+} else {
+  df_stage
+}
+```
 
 Calculate time delta to winner time for each rider:
 
 ```{r, file="R/time_delta.R"}
 ```
 
+```{r df_time_delta}
+#| code=df_manifest$command[df_manifest$name == "df_time_delta"],
+#| eval=!params$interactive
+```
+
 ```{r, echo=FALSE}
-tar_read(df_time_delta)
+if (params$interactive) {
+  tar_read(df_time_delta)
+} else {
+  df_time_delta
+}
 ```
 
 Extract time for each winner:
 
 ```{r, file="R/winner_time.R"}
 ```
+
+```{r df_winner_time}
+#| code=df_manifest$command[df_manifest$name == "df_winner_time"],
+#| eval=!params$interactive
+```
+
 
 # Analysis
 
@@ -151,11 +253,23 @@ Combine everything into one data frame. Calculate total time for each rider:
 ```{r, file="R/total_time.R"}
 ```
 
+```{r df_total_time}
+#| code=df_manifest$command[df_manifest$name == "df_total_time"],
+#| eval=!params$interactive
+```
+
+
 Summarise data per stage. Use this summary to arrange the description as an
 ordered factor. Exclude winner rows from the data:
 
 ```{r, file="R/total_time_summary.R"}
 ```
+
+```{r df_total_time_summary}
+#| code=df_manifest$command[df_manifest$name == "df_total_time_summary"],
+#| eval=!params$interactive
+```
+
 
 Visualize data. Arrange the stages based on the summary calculated in the
 preceding code chunk:
@@ -163,8 +277,22 @@ preceding code chunk:
 ```{r, file="R/vis_total_time.R"}
 ```
 
+```{r gg_total_time}
+#| code=df_manifest$command[df_manifest$name == "gg_total_time"],
+#| eval=!params$interactive
+```
+
+```{r png_total_time}
+#| code=df_manifest$command[df_manifest$name == "png_total_time"],
+#| eval=!params$interactive,
+#| include=FALSE
+```
+
 ```{r plot_total_time, echo=FALSE}
-knitr::include_graphics(tar_read(png_total_time))
+if (params$interactive) {
+  tar_load(png_total_time)
+}
+knitr::include_graphics(png_total_time)
 ```
 
 The top stages are almost all (except for `Cap Découverte`) mountain time

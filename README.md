@@ -16,6 +16,7 @@ packages:
     library(ggbeeswarm)
     library(conflicted)
     library(tidyverse)
+    library(assertr)
     library(distill)
     library(janitor)
     library(targets)
@@ -49,6 +50,8 @@ France edtion:
         year = start_year:year(today()),
         so_path = str_glue("{stages_overview_path}{year}"))
     }
+
+    df_tdf_editions <- tdf_editions(start_year, stages_overview_path)
 
     ## # A tibble: 25 × 2
     ##     year so_path                 
@@ -101,22 +104,24 @@ scraping restrictions defined in `robots.txt`.
       map_df(so_paths, \(x) scrape_overview(session_bow, x, stages_urls_css))
     }
 
+    df_stages_overview_raw <- stages_overview_raw(cycling_stats_url, so_paths, stages_urls_css)
+
 The result looks like this:
 
-    ## # A tibble: 791 × 5
-    ##    href                         desc         url_stages_overview  year url_stage
-    ##    <chr>                        <chr>        <chr>               <int> <glue>   
-    ##  1 team/us-postal-service-2000  US Postal S… https://www.procyc…  2000 https://…
-    ##  2 team/team-telekom-2000       Team Telekom https://www.procyc…  2000 https://…
-    ##  3 team/festina-lotus-2000      Festina - L… https://www.procyc…  2000 https://…
-    ##  4 team/festina-lotus-2000      Festina - L… https://www.procyc…  2000 https://…
-    ##  5 team/kelme-costa-blanca-2000 Kelme - Cos… https://www.procyc…  2000 https://…
-    ##  6 team/polti-2000              Polti        https://www.procyc…  2000 https://…
-    ##  7 team/kelme-costa-blanca-2000 Kelme - Cos… https://www.procyc…  2000 https://…
-    ##  8 team/kelme-costa-blanca-2000 Kelme - Cos… https://www.procyc…  2000 https://…
-    ##  9 team/banesto-2000            Banesto      https://www.procyc…  2000 https://…
-    ## 10 team/mapei-quickstep-2000    Mapei - Qui… https://www.procyc…  2000 https://…
-    ## # ℹ 781 more rows
+    ## # A tibble: 888 × 3
+    ##    href                         desc                 url                        
+    ##    <chr>                        <chr>                <chr>                      
+    ##  1 team/us-postal-service-2000  US Postal Service    https://www.procyclingstat…
+    ##  2 team/team-telekom-2000       Team Telekom         https://www.procyclingstat…
+    ##  3 team/festina-lotus-2000      Festina - Lotus      https://www.procyclingstat…
+    ##  4 team/festina-lotus-2000      Festina - Lotus      https://www.procyclingstat…
+    ##  5 team/kelme-costa-blanca-2000 Kelme - Costa Blanca https://www.procyclingstat…
+    ##  6 team/polti-2000              Polti                https://www.procyclingstat…
+    ##  7 team/kelme-costa-blanca-2000 Kelme - Costa Blanca https://www.procyclingstat…
+    ##  8 team/kelme-costa-blanca-2000 Kelme - Costa Blanca https://www.procyclingstat…
+    ##  9 team/banesto-2000            Banesto              https://www.procyclingstat…
+    ## 10 team/mapei-quickstep-2000    Mapei - Quickstep    https://www.procyclingstat…
+    ## # ℹ 878 more rows
 
 Preprocess stages overview. Only keep rows with description and extract
 year of the edition from `href`:
@@ -131,6 +136,8 @@ year of the edition from `href`:
           url_stage = str_glue("{cycling_stats_url}{href}")) |>
         filter(year <= 2023)
     }
+
+    df_stages_overview <- stages_overview(df_stages_overview_raw, cycling_stats_url)
 
 Filter for time trial stages. Keep only rows containing the following
 key word to do so:
@@ -149,6 +156,8 @@ short and simple:
           desc = str_squish(desc),
           desc = str_glue("{desc} ({year})"))
     }
+
+    df_stages_itt <- stages_itt(df_stages_overview, time_trial_regex)
 
     ## # A tibble: 40 × 5
     ##    href                              desc    url_stages_overview  year url_stage
@@ -191,6 +200,8 @@ above code chunk repeatedly.
       map_df(stages_paths, \(x) scrape_stage(session_bow, x, stage_tbl_css))
     }
 
+    df_stage <- stage(cycling_stats_url, stages_paths, stage_tbl_css)
+
     ## # A tibble: 6,569 × 15
     ##      rnk    gc timelag   bib h2h   specialty rider   age team    uci   pnt x    
     ##    <int> <int> <chr>   <int> <lgl> <chr>     <chr> <int> <chr> <int> <int> <lgl>
@@ -217,10 +228,10 @@ Calculate time delta to winner time for each rider:
             rnk == 1 ~ seconds(0),
             str_detect(time, ",") ~ ms(str_remove_all(time, ",")),
             TRUE ~ ms(str_sub(time, start = (str_length(time) / 2) + 1)))) |>
-        filter(!is.na(time_delta))
+        filter(!is.na(time_delta), time_delta >= 0)
     }
 
-    ## # A tibble: 6,550 × 3
+    ## # A tibble: 6,548 × 3
     ##    url_stage                                                    rider time_delta
     ##    <chr>                                                        <chr> <Period>  
     ##  1 https://www.procyclingstats.com/race/tour-de-france/2000/st… MILL… 0S        
@@ -233,7 +244,7 @@ Calculate time delta to winner time for each rider:
     ##  8 https://www.procyclingstats.com/race/tour-de-france/2000/st… BORG… 27S       
     ##  9 https://www.procyclingstats.com/race/tour-de-france/2000/st… HAMI… 33S       
     ## 10 https://www.procyclingstats.com/race/tour-de-france/2000/st… DEKK… 36S       
-    ## # ℹ 6,540 more rows
+    ## # ℹ 6,538 more rows
 
 Extract time for each winner:
 
