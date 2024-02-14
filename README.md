@@ -50,7 +50,7 @@ France edtion:
         so_path = str_glue("{stages_overview_path}{year}"))
     }
 
-    ## # A tibble: 24 × 2
+    ## # A tibble: 25 × 2
     ##     year so_path                 
     ##    <int> <glue>                  
     ##  1  2000 race/tour-de-france/2000
@@ -63,7 +63,7 @@ France edtion:
     ##  8  2007 race/tour-de-france/2007
     ##  9  2008 race/tour-de-france/2008
     ## 10  2009 race/tour-de-france/2009
-    ## # ℹ 14 more rows
+    ## # ℹ 15 more rows
 
 Scrape the stage overview for each edition by using the following helper
 function. After a first introduction (next code chunk) we alter the url
@@ -103,20 +103,20 @@ scraping restrictions defined in `robots.txt`.
 
 The result looks like this:
 
-    ## # A tibble: 513 × 5
-    ##    href                              desc    url_stages_overview  year url_stage
-    ##    <chr>                             <chr>   <chr>               <int> <glue>   
-    ##  1 race/tour-de-france/2000/stage-1  Stage … https://www.procyc…  2000 https://…
-    ##  2 race/tour-de-france/2000/stage-2  Stage … https://www.procyc…  2000 https://…
-    ##  3 race/tour-de-france/2000/stage-3  Stage … https://www.procyc…  2000 https://…
-    ##  4 race/tour-de-france/2000/stage-4  Stage … https://www.procyc…  2000 https://…
-    ##  5 race/tour-de-france/2000/stage-5  Stage … https://www.procyc…  2000 https://…
-    ##  6 race/tour-de-france/2000/stage-6  Stage … https://www.procyc…  2000 https://…
-    ##  7 race/tour-de-france/2000/stage-7  Stage … https://www.procyc…  2000 https://…
-    ##  8 race/tour-de-france/2000/stage-8  Stage … https://www.procyc…  2000 https://…
-    ##  9 race/tour-de-france/2000/stage-9  Stage … https://www.procyc…  2000 https://…
-    ## 10 race/tour-de-france/2000/stage-10 Stage … https://www.procyc…  2000 https://…
-    ## # ℹ 503 more rows
+    ## # A tibble: 791 × 5
+    ##    href                         desc         url_stages_overview  year url_stage
+    ##    <chr>                        <chr>        <chr>               <int> <glue>   
+    ##  1 team/us-postal-service-2000  US Postal S… https://www.procyc…  2000 https://…
+    ##  2 team/team-telekom-2000       Team Telekom https://www.procyc…  2000 https://…
+    ##  3 team/festina-lotus-2000      Festina - L… https://www.procyc…  2000 https://…
+    ##  4 team/festina-lotus-2000      Festina - L… https://www.procyc…  2000 https://…
+    ##  5 team/kelme-costa-blanca-2000 Kelme - Cos… https://www.procyc…  2000 https://…
+    ##  6 team/polti-2000              Polti        https://www.procyc…  2000 https://…
+    ##  7 team/kelme-costa-blanca-2000 Kelme - Cos… https://www.procyc…  2000 https://…
+    ##  8 team/kelme-costa-blanca-2000 Kelme - Cos… https://www.procyc…  2000 https://…
+    ##  9 team/banesto-2000            Banesto      https://www.procyc…  2000 https://…
+    ## 10 team/mapei-quickstep-2000    Mapei - Qui… https://www.procyc…  2000 https://…
+    ## # ℹ 781 more rows
 
 Preprocess stages overview. Only keep rows with description and extract
 year of the edition from `href`:
@@ -126,8 +126,10 @@ year of the edition from `href`:
         filter(desc != "") |>
         rename(url_stages_overview = url) |>
         mutate(
-          year = parse_integer(map_chr(str_split(href, "/"), 3)),
-          url_stage = str_glue("{cycling_stats_url}{href}"))
+          year = parse_integer(
+            map_chr(str_split(url_stages_overview, "/"), \(x) x[length(x)])),
+          url_stage = str_glue("{cycling_stats_url}{href}")) |>
+        filter(year <= 2023)
     }
 
 Filter for time trial stages. Keep only rows containing the following
@@ -201,7 +203,7 @@ above code chunk repeatedly.
     ##  7     7     7 +0:21       3 NA    TT        EKIM…    34 US P…    NA    22 NA   
     ##  8     8     8 +0:27      72 NA    Classic   BORG…    31 Merc…    NA    18 NA   
     ##  9     9     9 +0:33       4 NA    TT        HAMI…    29 US P…    NA    14 NA   
-    ## 10    10    10 +0:36      43 NA    TT        DEKK…    29 Rabo…    NA    10 NA   
+    ## 10    10    10 +0:36      43 NA    Classic   DEKK…    29 Rabo…    NA    10 NA   
     ## # ℹ 6,559 more rows
     ## # ℹ 3 more variables: time <chr>, avg <dbl>, url_stage <chr>
 
@@ -218,7 +220,7 @@ Calculate time delta to winner time for each rider:
         filter(!is.na(time_delta))
     }
 
-    ## # A tibble: 6,548 × 3
+    ## # A tibble: 6,550 × 3
     ##    url_stage                                                    rider time_delta
     ##    <chr>                                                        <chr> <Period>  
     ##  1 https://www.procyclingstats.com/race/tour-de-france/2000/st… MILL… 0S        
@@ -231,7 +233,7 @@ Calculate time delta to winner time for each rider:
     ##  8 https://www.procyclingstats.com/race/tour-de-france/2000/st… BORG… 27S       
     ##  9 https://www.procyclingstats.com/race/tour-de-france/2000/st… HAMI… 33S       
     ## 10 https://www.procyclingstats.com/race/tour-de-france/2000/st… DEKK… 36S       
-    ## # ℹ 6,538 more rows
+    ## # ℹ 6,540 more rows
 
 Extract time for each winner:
 
