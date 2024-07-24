@@ -126,20 +126,20 @@ scraping restrictions defined in `robots.txt`.
 
 The result looks like this:
 
-    ## # A tibble: 888 × 3
-    ##    href                         desc                 url                        
-    ##    <chr>                        <chr>                <chr>                      
-    ##  1 team/us-postal-service-2000  US Postal Service    https://www.procyclingstat…
-    ##  2 team/team-telekom-2000       Team Telekom         https://www.procyclingstat…
-    ##  3 team/festina-lotus-2000      Festina - Lotus      https://www.procyclingstat…
-    ##  4 team/festina-lotus-2000      Festina - Lotus      https://www.procyclingstat…
-    ##  5 team/kelme-costa-blanca-2000 Kelme - Costa Blanca https://www.procyclingstat…
-    ##  6 team/polti-2000              Polti                https://www.procyclingstat…
-    ##  7 team/kelme-costa-blanca-2000 Kelme - Costa Blanca https://www.procyclingstat…
-    ##  8 team/kelme-costa-blanca-2000 Kelme - Costa Blanca https://www.procyclingstat…
-    ##  9 team/banesto-2000            Banesto              https://www.procyclingstat…
-    ## 10 team/mapei-quickstep-2000    Mapei - Quickstep    https://www.procyclingstat…
-    ## # ℹ 878 more rows
+    ## # A tibble: 817 × 3
+    ##    href                             desc                                   url  
+    ##    <chr>                            <chr>                                  <chr>
+    ##  1 team/team-telekom-2000           Team Telekom                           http…
+    ##  2 team/festina-lotus-2000          Festina - Lotus                        http…
+    ##  3 team/festina-lotus-2000          Festina - Lotus                        http…
+    ##  4 team/kelme-costa-blanca-2000     Kelme - Costa Blanca                   http…
+    ##  5 team/polti-2000                  Polti                                  http…
+    ##  6 team/kelme-costa-blanca-2000     Kelme - Costa Blanca                   http…
+    ##  7 team/kelme-costa-blanca-2000     Kelme - Costa Blanca                   http…
+    ##  8 team/banesto-2000                Banesto                                http…
+    ##  9 team/mapei-quickstep-2000        Mapei - Quickstep                      http…
+    ## 10 race/tour-de-france/2000/stage-1 Stage 1 (ITT) | Futuroscope - Futuros… http…
+    ## # ℹ 807 more rows
 
 Preprocess stages overview. Only keep rows with description and extract
 year of the edition from `href`:
@@ -152,7 +152,7 @@ year of the edition from `href`:
           year = parse_integer(
             map_chr(str_split(url_stages_overview, "/"), \(x) x[length(x)])),
           url_stage = str_glue("{cycling_stats_url}{href}")) |>
-        filter(year <= 2023)
+        filter(year <= 2024)
     }
 
     df_stages_overview <- stages_overview(df_stages_overview_raw, cycling_stats_url)
@@ -177,7 +177,7 @@ short and simple:
 
     df_stages_itt <- stages_itt(df_stages_overview, time_trial_regex)
 
-    ## # A tibble: 40 × 5
+    ## # A tibble: 42 × 5
     ##    href                              desc    url_stages_overview  year url_stage
     ##    <chr>                             <glue>  <chr>               <int> <glue>   
     ##  1 race/tour-de-france/2000/stage-1  1 Futu… https://www.procyc…  2000 https://…
@@ -190,7 +190,7 @@ short and simple:
     ##  8 race/tour-de-france/2003/stage-19 19 Por… https://www.procyc…  2003 https://…
     ##  9 race/tour-de-france/2004/stage-16 16 Bou… https://www.procyc…  2004 https://…
     ## 10 race/tour-de-france/2004/stage-19 19 Bes… https://www.procyc…  2004 https://…
-    ## # ℹ 30 more rows
+    ## # ℹ 32 more rows
 
 Pull all the links into a vector for later analysis:
 
@@ -224,20 +224,20 @@ above code chunk repeatedly.
 
     df_stage <- stage(cycling_stats_url, stages_paths, stage_tbl_css)
 
-    ## # A tibble: 6,569 × 15
+    ## # A tibble: 6,885 × 15
     ##      rnk    gc timelag   bib h2h   specialty rider   age team    uci   pnt x    
-    ##    <int> <int> <chr>   <int> <lgl> <chr>     <chr> <int> <chr> <int> <int> <lgl>
-    ##  1     1     1 +0:00     127 NA    TT        MILL…    23 Cofi…    NA   100 NA   
-    ##  2     2     2 +0:02       1 NA    TT        ARMS…    28 US P…    NA    NA NA   
-    ##  3     3     3 +0:13      51 NA    Sprint    JALA…    31 O.N.…    NA    50 NA   
-    ##  4     4     4 +0:14      61 NA    TT        ULLR…    26 Team…    NA    40 NA   
-    ##  5     5     5 +0:17      52 NA    GC        CAÑA…    25 O.N.…    NA    32 NA   
-    ##  6     6     6 +0:20      11 NA    TT        ZÜLL…    31 Bane…    NA    26 NA   
-    ##  7     7     7 +0:21       3 NA    TT        EKIM…    34 US P…    NA    22 NA   
-    ##  8     8     8 +0:27      72 NA    Classic   BORG…    31 Merc…    NA    18 NA   
-    ##  9     9     9 +0:33       4 NA    TT        HAMI…    29 US P…    NA    14 NA   
-    ## 10    10    10 +0:36      43 NA    Classic   DEKK…    29 Rabo…    NA    10 NA   
-    ## # ℹ 6,559 more rows
+    ##    <int> <int> <chr>   <int> <lgl> <chr>     <chr> <int> <chr> <int> <int> <chr>
+    ##  1     1     1 +0:00     127 NA    TT        MILL…    23 Cofi…    NA   100 <NA> 
+    ##  2     2     2 +0:02       1 NA    TT        ARMS…    28 US P…    NA    NA <NA> 
+    ##  3     3     3 +0:13      51 NA    Sprint    JALA…    31 O.N.…    NA    50 <NA> 
+    ##  4     4     4 +0:14      61 NA    TT        ULLR…    26 Team…    NA    40 <NA> 
+    ##  5     5     5 +0:17      52 NA    GC        CAÑA…    25 O.N.…    NA    32 <NA> 
+    ##  6     6     6 +0:20      11 NA    TT        ZÜLL…    31 Bane…    NA    26 <NA> 
+    ##  7     7     7 +0:21       3 NA    TT        EKIM…    34 US P…    NA    22 <NA> 
+    ##  8     8     8 +0:27      72 NA    Classic   BORG…    31 Merc…    NA    18 <NA> 
+    ##  9     9     9 +0:33       4 NA    TT        HAMI…    29 US P…    NA    14 <NA> 
+    ## 10    10    10 +0:36      43 NA    TT        DEKK…    29 Rabo…    NA    10 <NA> 
+    ## # ℹ 6,875 more rows
     ## # ℹ 3 more variables: time <chr>, avg <dbl>, url_stage <chr>
 
 Calculate time delta to winner time for each rider:
@@ -255,7 +255,7 @@ Calculate time delta to winner time for each rider:
 
     df_time_delta <- time_delta(df_stage)
 
-    ## # A tibble: 6,548 × 3
+    ## # A tibble: 6,866 × 3
     ##    url_stage                                                    rider time_delta
     ##    <chr>                                                        <chr> <Period>  
     ##  1 https://www.procyclingstats.com/race/tour-de-france/2000/st… MILL… 0S        
@@ -268,7 +268,7 @@ Calculate time delta to winner time for each rider:
     ##  8 https://www.procyclingstats.com/race/tour-de-france/2000/st… BORG… 27S       
     ##  9 https://www.procyclingstats.com/race/tour-de-france/2000/st… HAMI… 33S       
     ## 10 https://www.procyclingstats.com/race/tour-de-france/2000/st… DEKK… 36S       
-    ## # ℹ 6,538 more rows
+    ## # ℹ 6,856 more rows
 
 Extract time for each winner:
 
