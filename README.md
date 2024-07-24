@@ -211,13 +211,9 @@ table:nth-child(1)’.
 Again, first `bow` to the host and then apply the function from the
 above code chunk repeatedly.
 
-    stage <- function(cycling_stats_url, stages_paths, stage_tbl_css) {
-      session_bow <- bow(cycling_stats_url)
-      
-      map_df(stages_paths, \(x) scrape_stage(session_bow, x, stage_tbl_css))
-    }
-
-    df_stage <- stage(cycling_stats_url, stages_paths, stage_tbl_css)
+    df_stage <- map_df(
+      stages_paths,
+      \(x) scrape_stage(cycling_stats_host, x, stage_tbl_css))
 
     ## # A tibble: 6,885 × 15
     ##      rnk    gc timelag   bib h2h   specialty rider   age team    uci   pnt x    

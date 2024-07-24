@@ -36,7 +36,9 @@ list(
     df_stages_itt, stages_itt(df_stages_overview, time_trial_regex)),
   tar_target(stages_paths, pull(df_stages_itt, href)),
   tar_target(
-    df_stage, stage(cycling_stats_url, stages_paths, stage_tbl_css)),
+    df_stage,
+    scrape_stage(cycling_stats_host, stages_paths, stage_tbl_css),
+    pattern = map(stages_paths)),
   tar_target(df_time_delta, time_delta(df_stage)),
   tar_target(df_winner_time, winner_time(df_stage)),
   tar_target(
