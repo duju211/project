@@ -21,12 +21,14 @@ list(
   tar_target(
     rvest_url, "https://rvest.tidyverse.org/articles/selectorgadget.html"),
   
+  tar_target(cycling_stats_host, bow(cycling_stats_url)),
   tar_target(
     df_tdf_editions, tdf_editions(start_year, stages_overview_path)),
   tar_target(so_paths, pull(df_tdf_editions, so_path)),
   tar_target(
     df_stages_overview_raw,
-    stages_overview_raw(cycling_stats_url, so_paths, stages_urls_css)),
+    scrape_overview(cycling_stats_host, so_paths, stages_urls_css),
+    pattern = map(so_paths)),
   tar_target(
     df_stages_overview,
     stages_overview(df_stages_overview_raw, cycling_stats_url)),

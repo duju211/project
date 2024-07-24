@@ -132,12 +132,9 @@ the `polite::bow` function. After that we apply the above function to each
 edition. By doing this we automatically apply to the
 scraping restrictions defined in `robots.txt`.
 
-```{r, file="R/stages_overview_raw.R"}
-```
-
-```{r df_stages_overview_raw}
-#| code=df_manifest$command[df_manifest$name == "df_stages_overview_raw"],
-#| eval=!params$interactive
+```{r df_stages_overview_raw, eval=!params$interactive}
+df_stages_overview_raw <- map_df(
+  so_paths, \(x) scrape_overview(cycling_stats_host, x, stages_urls_css))
 ```
 
 The result looks like this:

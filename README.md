@@ -116,13 +116,8 @@ ourselves with the `polite::bow` function. After that we apply the above
 function to each edition. By doing this we automatically apply to the
 scraping restrictions defined in `robots.txt`.
 
-    stages_overview_raw <- function(cycling_stats_url, so_paths, stages_urls_css) {
-      session_bow <- bow(cycling_stats_url)
-      
-      map_df(so_paths, \(x) scrape_overview(session_bow, x, stages_urls_css))
-    }
-
-    df_stages_overview_raw <- stages_overview_raw(cycling_stats_url, so_paths, stages_urls_css)
+    df_stages_overview_raw <- map_df(
+      so_paths, \(x) scrape_overview(cycling_stats_host, x, stages_urls_css))
 
 The result looks like this:
 
