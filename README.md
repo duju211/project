@@ -196,8 +196,8 @@ helper function. In the scraped html look for the CSS defined by
 ‘div.result-cont:nth-child(5) &gt; div:nth-child(1) &gt;
 table:nth-child(1)’.
 
-    scrape_stage <- function(session_bow, stage_path, stage_tbl_css) {
-      stage_url <- nod(session_bow, path = stage_path)
+    scrape_stage <- function(cycling_stats_host, stage_path, stage_tbl_css) {
+      stage_url <- nod(cycling_stats_host, path = stage_path)
       
       stage_html <- scrape(stage_url)
       
@@ -208,8 +208,7 @@ table:nth-child(1)’.
         mutate(rnk = row_number(), url_stage = stage_url$url)
     }
 
-Again, first `bow` to the host and then apply the function from the
-above code chunk repeatedly.
+Apply the function from the above code chunk repeatedly.
 
     df_stage <- map_df(
       stages_paths,

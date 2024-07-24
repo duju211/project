@@ -2618,8 +2618,8 @@ function. In the scraped html look for the CSS defined by
 ‘div.result-cont:nth-child(5) &gt; div:nth-child(1) &gt; table:nth-child(1)’.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span><span class="va">scrape_stage</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">session_bow</span>, <span class="va">stage_path</span>, <span class="va">stage_tbl_css</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">stage_url</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dmi3kno.github.io/polite/reference/nod.html">nod</a></span><span class="op">(</span><span class="va">session_bow</span>, path <span class="op">=</span> <span class="va">stage_path</span><span class="op">)</span></span>
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class="va">scrape_stage</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">cycling_stats_host</span>, <span class="va">stage_path</span>, <span class="va">stage_tbl_css</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">stage_url</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dmi3kno.github.io/polite/reference/nod.html">nod</a></span><span class="op">(</span><span class="va">cycling_stats_host</span>, path <span class="op">=</span> <span class="va">stage_path</span><span class="op">)</span></span>
 <span>  </span>
 <span>  <span class="va">stage_html</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dmi3kno.github.io/polite/reference/scrape.html">scrape</a></span><span class="op">(</span><span class="va">stage_url</span><span class="op">)</span></span>
 <span>  </span>
@@ -2631,8 +2631,7 @@ function. In the scraped html look for the CSS defined by
 <span><span class="op">}</span></span></code></pre>
 </div>
 </div>
-<p>Again, first <code>bow</code> to the host and then apply the function from the
-above code chunk repeatedly.</p>
+<p>Apply the function from the above code chunk repeatedly.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
 <pre class="sourceCode r"><code class="sourceCode r"><span><span class="va">df_stage</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://purrr.tidyverse.org/reference/map_dfr.html">map_df</a></span><span class="op">(</span></span>

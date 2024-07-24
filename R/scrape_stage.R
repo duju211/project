@@ -1,5 +1,5 @@
-scrape_stage <- function(session_bow, stage_path, stage_tbl_css) {
-  stage_url <- nod(session_bow, path = stage_path)
+scrape_stage <- function(cycling_stats_host, stage_path, stage_tbl_css) {
+  stage_url <- nod(cycling_stats_host, path = stage_path)
   
   stage_html <- scrape(stage_url)
   
